@@ -16,8 +16,8 @@ public class UserController {
         this.registerService = registerService;
     }
 
-    //Cadastrar colaborador
-    @PostMapping("/cad-colab")
+    //Cadastrar agencia
+    @PostMapping("/cad-agency")
     public ResponseEntity<String> cadColab(@RequestBody AgencyRequest request, HttpSession session){
         return registerService.cadastrarAgencia(request, session);
     }

@@ -44,6 +44,9 @@ public class RegisterService {
 
         agencyRepository.save(agency);
 
+        user.setAgency(agency);
+        userRepository.save(user);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Agência registrada!");
     }
