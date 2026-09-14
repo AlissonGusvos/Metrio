@@ -74,6 +74,10 @@ public class RegisterService {
             return ResponseEntity.badRequest().body("Agência não encontrada");
         }
 
+        if(clientRepository.findByLogin(request.clientLogin()).isPresent()){
+            return ResponseEntity.badRequest().body("Login já existente");
+        }
+
         Agency agency = agencyOptional.get();
         Client client = new Client();
 
@@ -85,12 +89,6 @@ public class RegisterService {
         client.setClientLogin(request.clientLogin());
         client.setClientPass(hashedClientPassword);
         client.setClientStatus(String.valueOf(UserStatus.ACTIVE));
-
-        System.out.println("CLIENT NAME: " + client.getClientName());
-        System.out.println("CLIENT LOGIN: " + client.getClientLogin());
-        System.out.println("CLIENT PASS: " + client.getClientPass());
-        System.out.println("CLIENT STATUS: " + client.getClientStatus());
-        System.out.println("AGENCY: " + client.getAgency());
 
         clientRepository.save(client);
 

@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface AgencyRepository extends JpaRepository<Agency, Long> {
     Optional<Agency> findById(Long id);
+
+    boolean findByLogin();
 }
