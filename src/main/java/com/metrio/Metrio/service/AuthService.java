@@ -59,6 +59,9 @@ public class AuthService {
 
         //Guardar ID em sessão
         session.setAttribute("userId", user.getId());
+        if(user.getAgency() != null){
+            session.setAttribute("agencyId", user.getAgency().getId());
+        }
     }
 
 }

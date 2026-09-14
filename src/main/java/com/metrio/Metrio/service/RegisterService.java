@@ -1,7 +1,11 @@
 package com.metrio.Metrio.service;
 
+import com.metrio.Metrio.configuration.EncriptConfig;
+import com.metrio.Metrio.configuration.UserStatus;
 import com.metrio.Metrio.dto.AgencyRequest;
+import com.metrio.Metrio.dto.ClientRequest;
 import com.metrio.Metrio.models.Agency;
+import com.metrio.Metrio.models.Client;
 import com.metrio.Metrio.models.User;
 import com.metrio.Metrio.repository.AgencyRepository;
 import com.metrio.Metrio.repository.ClientRepository;
@@ -10,6 +14,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class RegisterService {
@@ -47,7 +53,48 @@ public class RegisterService {
         user.setAgency(agency);
         userRepository.save(user);
 
+        //Guardar ID da agência em sessão
+        session.setAttribute("agencyId", agency.getId());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Agência registrada!");
+    }
+
+    // Cadastrar cliente
+    public ResponseEntity<String> cadastrarCliente(ClientRequest request, HttpSession session){
+
+        // Verificar se agência existe e está logada
+        Long agencyId = (Long) session.getAttribute("agencyId");
+        if(agencyId == null){
+            return ResponseEntity.badRequest().body("Agência não encontrada");
+        }
+
+        Optional<Agency> agencyOptional = agencyRepository.findById(agencyId);
+        if(agencyOptional.isEmpty()){
+            return ResponseEntity.badRequest().body("Agência não encontrada");
+        }
+
+        Agency agency = agencyOptional.get();
+        Client client = new Client();
+
+        String hashedClientPassword = EncriptConfig.passwordEncoder().encode(request.clientPassword());
+
+        client.setAgency(agency);
+
+        client.setClientName(request.clientName());
+        client.setClientLogin(request.clientLogin());
+        client.setClientPass(hashedClientPassword);
+        client.setClientStatus(String.valueOf(UserStatus.ACTIVE));
+
+        System.out.println("CLIENT NAME: " + client.getClientName());
+        System.out.println("CLIENT LOGIN: " + client.getClientLogin());
+        System.out.println("CLIENT PASS: " + client.getClientPass());
+        System.out.println("CLIENT STATUS: " + client.getClientStatus());
+        System.out.println("AGENCY: " + client.getAgency());
+
+        clientRepository.save(client);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Cliente cadastrado!");
     }
 }
